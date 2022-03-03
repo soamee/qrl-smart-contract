@@ -1,0 +1,53 @@
+{
+    "emulators": {
+        "default": {
+            "port": 3569,
+            "serviceAccount": "emulator-account"
+        }
+    },
+    "contracts": {
+        "MetadataViews": "./contracts/MetadataViews.cdc",
+        "SwaychainNFT": {
+            "source": "./contracts/SwaychainNFT.cdc",
+            "aliases": {
+                "emulator": "0xee82856bf20e2aa6",
+                "testnet": "0x5dfbd0d5aba6acf7"
+            }
+        },
+        "NonFungibleToken": {
+            "source": "./contracts/NonFungibleToken.cdc",
+            "aliases": {
+                "testnet": "0x5dfbd0d5aba6acf7"
+            }
+        }
+    },
+    "networks": {
+        "emulator": "127.0.0.1:3569",
+        "mainnet": "access.mainnet.nodes.onflow.org:9000",
+        "testnet": "access.devnet.nodes.onflow.org:9000"
+    },
+    "accounts": {
+        "emulator-account": {
+            "address": "0xf8d6e0586b0a20c7",
+            "key": "ca102a35963666f3b517a903b747da4eece5e0553523cb8e59a851e162c85db2"
+        },
+        "testnet-account": {
+            "address": "0x5dfbd0d5aba6acf7",
+            "key": "6358361f105b658bdab5cfa8cd103706081469770fb88a8dec104590a93f7344"
+        }
+    },
+    "deployments": {
+        "emulator": {
+            "emulator-account": [
+                "SwaychainNFT"
+            ]
+        },
+        "testnet": {
+            "testnet-account": [
+                "MetadataViews",
+                "NonFungibleToken",
+                "SwaychainNFT"
+            ]
+        }
+    }
+}

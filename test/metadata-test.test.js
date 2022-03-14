@@ -28,7 +28,10 @@ describe("setup-test", () => {
       }  
     `;
 
-    const args = [{ name: "Boris", nickname: "The Blade" }];
+    const args = [{
+      name: "Boris",
+      nickname: "The Blade"
+    }];
 
     const [name, err] = await shallResolve(executeScript({ code, args }));
     expect(name).toBe('Boris');
@@ -43,7 +46,10 @@ describe("setup-test", () => {
       }  
     `;
 
-    const args = [{ name: "Boris", nickname: "The Blade" }];
+    const args = [{
+      name: "Boris",
+      nickname: "The Blade"
+    }];
 
     const [nickname, err] = await shallResolve(executeScript({ code, args }));
     expect(nickname).toBe('The Blade');

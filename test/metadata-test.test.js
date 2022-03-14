@@ -32,7 +32,7 @@ describe("setup-test", () => {
 
     const [name, err] = await shallResolve(executeScript({ code, args }));
     expect(name).toBe('Boris');
-    expect(err).toBeUndefined();
+    expect(err).toBeFalsy();
   });
 
 
@@ -47,6 +47,6 @@ describe("setup-test", () => {
 
     const [nickname, err] = await shallResolve(executeScript({ code, args }));
     expect(nickname).toBe('The Blade');
-    expect(err).toBeUndefined();
+    expect(err).toBeFalsy();
   });
 })

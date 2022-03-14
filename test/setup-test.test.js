@@ -4,7 +4,7 @@ import { emulator, init } from "flow-js-testing";
 // Increase timeout if your tests failing due to timeout
 jest.setTimeout(10000);
 
-describe("basic-test", ()=>{
+describe("setup-test", ()=>{
   beforeEach(async () => {
     const basePath = path.resolve(__dirname, "../contracts"); 
 		// You can specify different port to parallelize execution of describe blocks

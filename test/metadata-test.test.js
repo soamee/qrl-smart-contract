@@ -14,20 +14,6 @@ describe("setup-test", () => {
 
     await init(basePath, { port });
     emulator.start(port, logging);
-
-    const code = `
-    pub fun main(metadata: {String: String}): String{
-      return metadata["name"]!
-    }  
-  `;
-
-    // Define arguments we want to pass
-    const args = [{ name: "Boris", nickname: "The Blade" }];
-
-    // If something goes wrong with script execution, the method will throw an error
-    // so we need to catch it and proce
-    const [name, err] = await shallResolve(executeScript({ code, args }));
-    console.log(name, err);
   });
 
   // Stop emulator, so it could be restarted
@@ -35,7 +21,32 @@ describe("setup-test", () => {
     return emulator.stop();
   });
 
-  test("+++", async () => {
-    // WRITE YOUR ASSERTS HERE
-  })
+  test(`check "name"`, async () => {
+    const code = `
+      pub fun main(metadata: {String: String}): String{
+        return metadata["name"]!
+      }  
+    `;
+
+    const args = [{ name: "Boris", nickname: "The Blade" }];
+
+    const [name, err] = await shallResolve(executeScript({ code, args }));
+    expect(name).toBe('Boris');
+    expect(err).toBeUndefined();
+  });
+
+
+  test(`check "nickname"`, async () => {
+    const code = `
+      pub fun main(metadata: {String: String}): String{
+        return metadata["nickname"]!
+      }  
+    `;
+
+    const args = [{ name: "Boris", nickname: "The Blade" }];
+
+    const [nickname, err] = await shallResolve(executeScript({ code, args }));
+    expect(nickname).toBe('The Blade');
+    expect(err).toBeUndefined();
+  });
 })

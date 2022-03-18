@@ -2,8 +2,8 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0xa68a6bd07831e78c
-import MetadataViews from 0xa68a6bd07831e78c
+import NonFungibleToken from 0x1d7e57aa55817448
+import MetadataViews from 0x1d7e57aa55817448
 
 pub contract SwaychainNFT: NonFungibleToken {
 

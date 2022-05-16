@@ -38,6 +38,8 @@ pub contract SwaychainNFT: NonFungibleToken {
             return self.attributes
         }
 
+        access(self) let royalties: [MetadataViews.Royalty]
+
         init(
             id: UInt64,
             name: String,
@@ -46,17 +48,24 @@ pub contract SwaychainNFT: NonFungibleToken {
             projectID: String,
             projectName: String,
             attributes: {String: String},
-            metadata: {String: String}
+            metadata: {String: String},
+            royalties: [MetadataViews.Royalty]
         ) {
             self.id = id
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
+            self.projectID = projectID
+            self.projectName = projectName
+            self.attributes = attributes
+            self.metadata = metadata
+            self.royalties = royalties
         }
     
         pub fun getViews(): [Type] {
             return [
-                Type<MetadataViews.Display>()
+                Type<MetadataViews.Display>(),
+                Type<MetadataViews.Royalties>()
             ]
         }
 
@@ -69,6 +78,10 @@ pub contract SwaychainNFT: NonFungibleToken {
                         thumbnail: MetadataViews.HTTPFile(
                             url: self.thumbnail
                         )
+                    )
+                case Type<MetadataViews.Royalties>():
+                    return MetadataViews.Royalties(
+                        self.royalties
                     )
             }
 
@@ -174,6 +187,7 @@ pub contract SwaychainNFT: NonFungibleToken {
             projectName: String,
             attributes: {String: String},
             metadata: {String: String},
+            royalties: [MetadataViews.Royalty]
         ) {
 
             // create a new NFT
@@ -186,6 +200,7 @@ pub contract SwaychainNFT: NonFungibleToken {
                 projectName: projectName,
                 attributes: attributes,
                 metadata: metadata,
+                royalties: royalties
             )
 
             emit Minted(

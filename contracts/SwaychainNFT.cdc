@@ -2,17 +2,20 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0x631e88ae7f1d7c20
-import MetadataViews from 0x631e88ae7f1d7c20
+import NonFungibleToken from 0x1d7e57aa55817448
+import MetadataViews from 0x1d7e57aa55817448
 
 pub contract SwaychainNFT: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
+    // Events
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
+    pub event Minted(id: UInt64, projectName: String, projectID: String)
 
+    // Named paths
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
     pub let MinterStoragePath: StoragePath
@@ -24,11 +27,26 @@ pub contract SwaychainNFT: NonFungibleToken {
         pub let description: String
         pub let thumbnail: String
 
+        pub let projectID: String
+        pub let projectName: String
+        access(self) let attributes: {String: String}
+        pub fun getAttributes(): {String: String} {
+            return self.attributes
+        }
+        access(self) let metadata: {String: String}
+        pub fun getMetadata(): {String: String} {
+            return self.attributes
+        }
+
         init(
             id: UInt64,
             name: String,
             description: String,
             thumbnail: String,
+            projectID: String,
+            projectName: String,
+            attributes: {String: String},
+            metadata: {String: String}
         ) {
             self.id = id
             self.name = name
@@ -152,6 +170,10 @@ pub contract SwaychainNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
+            projectID: String,
+            projectName: String,
+            attributes: {String: String},
+            metadata: {String: String},
         ) {
 
             // create a new NFT
@@ -160,8 +182,17 @@ pub contract SwaychainNFT: NonFungibleToken {
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
+                projectID: projectID,
+                projectName: projectName,
+                attributes: attributes,
+                metadata: metadata,
             )
 
+            emit Minted(
+                id: SwaychainNFT.totalSupply,
+                projectName: projectName,
+                projectID: projectID
+            )
             // deposit it in the recipient's account using their reference
             recipient.deposit(token: <-newNFT)
 

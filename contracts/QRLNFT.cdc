@@ -1,11 +1,11 @@
-// This is an swaychain implementation of a Flow Non-Fungible Token
+// This is an qrl implementation of a Flow Non-Fungible Token
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
 import NonFungibleToken from 0x1d7e57aa55817448
 import MetadataViews from 0x1d7e57aa55817448
 
-pub contract SwaychainNFT: NonFungibleToken {
+pub contract QRLNFT: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
@@ -89,19 +89,19 @@ pub contract SwaychainNFT: NonFungibleToken {
         }
     }
 
-    pub resource interface SwaychainNFTCollectionPublic {
+    pub resource interface QRLNFTCollectionPublic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowSwaychainNFT(id: UInt64): &SwaychainNFT.NFT? {
+        pub fun borrowQRLNFT(id: UInt64): &QRLNFT.NFT? {
             post {
                 (result == nil) || (result?.id == id):
-                    "Cannot borrow SwaychainNFT reference: the ID of the returned reference is incorrect"
+                    "Cannot borrow QRLNFT reference: the ID of the returned reference is incorrect"
             }
         }
     }
 
-    pub resource Collection: SwaychainNFTCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: QRLNFTCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -122,7 +122,7 @@ pub contract SwaychainNFT: NonFungibleToken {
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         pub fun deposit(token: @NonFungibleToken.NFT) {
-            let token <- token as! @SwaychainNFT.NFT
+            let token <- token as! @QRLNFT.NFT
 
             let id: UInt64 = token.id
 
@@ -145,11 +145,11 @@ pub contract SwaychainNFT: NonFungibleToken {
             return &self.ownedNFTs[id] as &NonFungibleToken.NFT
         }
  
-        pub fun borrowSwaychainNFT(id: UInt64): &SwaychainNFT.NFT? {
+        pub fun borrowQRLNFT(id: UInt64): &QRLNFT.NFT? {
             if self.ownedNFTs[id] != nil {
                 // Create an authorized reference to allow downcasting
                 let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
-                return ref as! &SwaychainNFT.NFT
+                return ref as! &QRLNFT.NFT
             }
 
             return nil
@@ -157,8 +157,8 @@ pub contract SwaychainNFT: NonFungibleToken {
 
         pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
             let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
-            let swaychainNFT = nft as! &SwaychainNFT.NFT
-            return swaychainNFT as &AnyResource{MetadataViews.Resolver}
+            let qrlNFT = nft as! &QRLNFT.NFT
+            return qrlNFT as &AnyResource{MetadataViews.Resolver}
         }
 
         destroy() {
@@ -192,7 +192,7 @@ pub contract SwaychainNFT: NonFungibleToken {
 
             // create a new NFT
             var newNFT <- create NFT(
-                id: SwaychainNFT.totalSupply,
+                id: QRLNFT.totalSupply,
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
@@ -204,14 +204,14 @@ pub contract SwaychainNFT: NonFungibleToken {
             )
 
             emit Minted(
-                id: SwaychainNFT.totalSupply,
+                id: QRLNFT.totalSupply,
                 projectName: projectName,
                 projectID: projectID
             )
             // deposit it in the recipient's account using their reference
             recipient.deposit(token: <-newNFT)
 
-            SwaychainNFT.totalSupply = SwaychainNFT.totalSupply + UInt64(1)
+            QRLNFT.totalSupply = QRLNFT.totalSupply + UInt64(1)
         }
     }
 
@@ -220,16 +220,16 @@ pub contract SwaychainNFT: NonFungibleToken {
         self.totalSupply = 0
 
         // Set the named paths
-        self.CollectionStoragePath = /storage/swaychainNFTCollection
-        self.CollectionPublicPath = /public/swaychainNFTCollection
-        self.MinterStoragePath = /storage/swaychainNFTMinter
+        self.CollectionStoragePath = /storage/qrlNFTCollection
+        self.CollectionPublicPath = /public/qrlNFTCollection
+        self.MinterStoragePath = /storage/qrlNFTMinter
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&SwaychainNFT.Collection{NonFungibleToken.CollectionPublic, SwaychainNFT.SwaychainNFTCollectionPublic}>(
+        self.account.link<&QRLNFT.Collection{NonFungibleToken.CollectionPublic, QRLNFT.QRLNFTCollectionPublic}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

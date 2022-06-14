@@ -7,8 +7,8 @@
     },
     "contracts": {
         "MetadataViews": "./contracts/MetadataViews.cdc",
-        "SwaychainNFT": {
-            "source": "./contracts/SwaychainNFT.cdc",
+        "QRLNFT": {
+            "source": "./contracts/QRLNFT.cdc",
             "aliases": {
                 "emulator": "0xf8d6e0586b0a20c7",
                 "testnet": "0x5dfbd0d5aba6acf7"
@@ -42,14 +42,14 @@
             "emulator-account": [
                 "MetadataViews",
                 "NonFungibleToken",
-                "SwaychainNFT"
+                "QRLNFT"
             ]
         },
         "testnet": {
             "testnet-account": [
                 "MetadataViews",
                 "NonFungibleToken",
-                "SwaychainNFT"
+                "QRLNFT"
             ]
         }
     }

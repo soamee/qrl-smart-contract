@@ -2,20 +2,17 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0x1d7e57aa55817448
-import MetadataViews from 0x1d7e57aa55817448
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import MetadataViews from 0x631e88ae7f1d7c20
 
 pub contract QRLNFT: NonFungibleToken {
 
-    pub var totalSupply: UInt64
+     pub var totalSupply: UInt64
 
-    // Events
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
-    pub event Minted(id: UInt64, projectName: String, projectID: String)
 
-    // Named paths
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
     pub let MinterStoragePath: StoragePath
@@ -26,18 +23,6 @@ pub contract QRLNFT: NonFungibleToken {
         pub let name: String
         pub let description: String
         pub let thumbnail: String
-
-        pub let projectID: String
-        pub let projectName: String
-        access(self) let attributes: {String: String}
-        pub fun getAttributes(): {String: String} {
-            return self.attributes
-        }
-        access(self) let metadata: {String: String}
-        pub fun getMetadata(): {String: String} {
-            return self.attributes
-        }
-
         access(self) let royalties: [MetadataViews.Royalty]
 
         init(
@@ -45,27 +30,24 @@ pub contract QRLNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
-            projectID: String,
-            projectName: String,
-            attributes: {String: String},
-            metadata: {String: String},
             royalties: [MetadataViews.Royalty]
         ) {
             self.id = id
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
-            self.projectID = projectID
-            self.projectName = projectName
-            self.attributes = attributes
-            self.metadata = metadata
             self.royalties = royalties
         }
     
         pub fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
-                Type<MetadataViews.Royalties>()
+                Type<MetadataViews.Royalties>(),
+                Type<MetadataViews.Editions>(),
+                Type<MetadataViews.ExternalURL>(),
+                Type<MetadataViews.NFTCollectionData>(),
+                Type<MetadataViews.NFTCollectionDisplay>(),
+                Type<MetadataViews.Serial>()
             ]
         }
 
@@ -79,12 +61,54 @@ pub contract QRLNFT: NonFungibleToken {
                             url: self.thumbnail
                         )
                     )
+                case Type<MetadataViews.Editions>():
+                    // There is no max number of NFTs that can be minted from this contract
+                    // so the max edition field value is set to nil
+                    let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.id, max: nil)
+                    let editionList: [MetadataViews.Edition] = [editionInfo]
+                    return MetadataViews.Editions(
+                        editionList
+                    )
+                case Type<MetadataViews.Serial>():
+                    return MetadataViews.Serial(
+                        self.id
+                    )
                 case Type<MetadataViews.Royalties>():
                     return MetadataViews.Royalties(
                         self.royalties
                     )
+                case Type<MetadataViews.ExternalURL>():
+                    return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
+                case Type<MetadataViews.NFTCollectionData>():
+                    return MetadataViews.NFTCollectionData(
+                        storagePath: QRLNFT.CollectionStoragePath,
+                        publicPath: QRLNFT.CollectionPublicPath,
+                        providerPath: /private/QRLNFTCollection,
+                        publicCollection: Type<&QRLNFT.Collection{QRLNFT.QRLNFTCollectionPublic}>(),
+                        publicLinkedType: Type<&QRLNFT.Collection{QRLNFT.QRLNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&QRLNFT.Collection{QRLNFT.QRLNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                            return <-QRLNFT.createEmptyCollection()
+                        })
+                    )
+                case Type<MetadataViews.NFTCollectionDisplay>():
+                    let media = MetadataViews.Media(
+                        file: MetadataViews.HTTPFile(
+                            url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                        ),
+                        mediaType: "image/svg+xml"
+                    )
+                    return MetadataViews.NFTCollectionDisplay(
+                        name: "The Example Collection",
+                        description: "This collection is used as an example to help you develop your next Flow NFT.",
+                        externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
+                        squareImage: media,
+                        bannerImage: media,
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                        }
+                    )
             }
-
             return nil
         }
     }
@@ -142,13 +166,13 @@ pub contract QRLNFT: NonFungibleToken {
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
  
         pub fun borrowQRLNFT(id: UInt64): &QRLNFT.NFT? {
             if self.ownedNFTs[id] != nil {
                 // Create an authorized reference to allow downcasting
-                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 return ref as! &QRLNFT.NFT
             }
 
@@ -156,9 +180,9 @@ pub contract QRLNFT: NonFungibleToken {
         }
 
         pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
-            let qrlNFT = nft as! &QRLNFT.NFT
-            return qrlNFT as &AnyResource{MetadataViews.Resolver}
+            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let QRLNFT = nft as! &QRLNFT.NFT
+            return QRLNFT as &AnyResource{MetadataViews.Resolver}
         }
 
         destroy() {
@@ -183,10 +207,6 @@ pub contract QRLNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
-            projectID: String,
-            projectName: String,
-            attributes: {String: String},
-            metadata: {String: String},
             royalties: [MetadataViews.Royalty]
         ) {
 
@@ -196,18 +216,9 @@ pub contract QRLNFT: NonFungibleToken {
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
-                projectID: projectID,
-                projectName: projectName,
-                attributes: attributes,
-                metadata: metadata,
                 royalties: royalties
             )
 
-            emit Minted(
-                id: QRLNFT.totalSupply,
-                projectName: projectName,
-                projectID: projectID
-            )
             // deposit it in the recipient's account using their reference
             recipient.deposit(token: <-newNFT)
 
@@ -220,16 +231,16 @@ pub contract QRLNFT: NonFungibleToken {
         self.totalSupply = 0
 
         // Set the named paths
-        self.CollectionStoragePath = /storage/qrlNFTCollection
-        self.CollectionPublicPath = /public/qrlNFTCollection
-        self.MinterStoragePath = /storage/qrlNFTMinter
+        self.CollectionStoragePath = /storage/QRLNFTCollection
+        self.CollectionPublicPath = /public/QRLNFTCollection
+        self.MinterStoragePath = /storage/QRLNFTMinter
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&QRLNFT.Collection{NonFungibleToken.CollectionPublic, QRLNFT.QRLNFTCollectionPublic}>(
+        self.account.link<&QRLNFT.Collection{NonFungibleToken.CollectionPublic, QRLNFT.QRLNFTCollectionPublic, MetadataViews.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

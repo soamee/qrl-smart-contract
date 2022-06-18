@@ -2,8 +2,8 @@
 // It is not part of the official standard but it assumed to be
 // very similar to how many NFTs would implement the core functionality.
 
-import NonFungibleToken from 0x1d7e57aa55817448
-import MetadataViews from 0x1d7e57aa55817448
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import MetadataViews from 0x631e88ae7f1d7c20
 
 pub contract QRLNFT: NonFungibleToken {
 
@@ -114,8 +114,7 @@ pub contract QRLNFT: NonFungibleToken {
                     )
                     return MetadataViews.NFTCollectionDisplay(
                         name: "The Ultimate Queenslander NFT",
-                        description: "
-In search of the best postcode in the Metaverse, we have dreamt of the quintessential experience. A cauldron of energy, irrepressible, forming a virtual oasis of landscapes shaped by the community, aligned to the spirit of the state.",
+                        description: "In search of the best postcode in the Metaverse, we have dreamt of the quintessential experience.",
                         externalURL: MetadataViews.ExternalURL("https://qldernft.com/"),
                         squareImage: media,
                         bannerImage: media,

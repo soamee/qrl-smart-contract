@@ -11,14 +11,16 @@
             "source": "./contracts/QRLNFT.cdc",
             "aliases": {
                 "emulator": "0xf8d6e0586b0a20c7",
-                "testnet": "0x5dfbd0d5aba6acf7"
+                "testnet": "0x5dfbd0d5aba6acf7",
+                "mainnet": "0xa4e9020ad21eb30b"
             }
         },
         "NonFungibleToken": {
             "source": "./contracts/NonFungibleToken.cdc",
             "aliases": {
                 "emulator": "0xf8d6e0586b0a20c7",
-                "testnet": "0x5dfbd0d5aba6acf7"
+                "testnet": "0x5dfbd0d5aba6acf7",
+                "mainnet": "0xa4e9020ad21eb30b"
             }
         }
     },
@@ -35,6 +37,10 @@
         "testnet-account": {
             "address": "0x5dfbd0d5aba6acf7",
             "key": "6358361f105b658bdab5cfa8cd103706081469770fb88a8dec104590a93f7344"
+        },
+        "mainnet-account": {
+            "address": "0xa4e9020ad21eb30b",
+            "key": "6358361f105b658bdab5cfa8cd103706081469770fb88a8dec104590a93f7344"
         }
     },
     "deployments": {
@@ -47,8 +53,11 @@
         },
         "testnet": {
             "testnet-account": [
-                "MetadataViews",
-                "NonFungibleToken",
+                "QRLNFT"
+            ]
+        },
+        "mainnet": {
+            "mainnet-account": [
                 "QRLNFT"
             ]
         }

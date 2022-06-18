@@ -23,6 +23,16 @@ pub contract QRLNFT: NonFungibleToken {
         pub let name: String
         pub let description: String
         pub let thumbnail: String
+
+        access(self) let attributes: {String: String}
+        pub fun getAttributes(): {String: String} {
+            return self.attributes
+        }
+        access(self) let metadata: {String: String}
+        pub fun getMetadata(): {String: String} {
+            return self.attributes
+        }
+
         access(self) let royalties: [MetadataViews.Royalty]
 
         init(
@@ -30,13 +40,17 @@ pub contract QRLNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
-            royalties: [MetadataViews.Royalty]
+            royalties: [MetadataViews.Royalty],
+            attributes: {String: String},
+            metadata: {String: String}
         ) {
             self.id = id
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
             self.royalties = royalties
+            self.attributes = attributes;
+            self.metadata = metadata;
         }
     
         pub fun getViews(): [Type] {
@@ -207,7 +221,9 @@ pub contract QRLNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
-            royalties: [MetadataViews.Royalty]
+            royalties: [MetadataViews.Royalty],
+            attributes: {String: String},
+            metadata: {String: String}
         ) {
 
             // create a new NFT
@@ -216,7 +232,9 @@ pub contract QRLNFT: NonFungibleToken {
                 name: name,
                 description: description,
                 thumbnail: thumbnail,
-                royalties: royalties
+                royalties: royalties,
+                attributes: attributes,
+                metadata: metadata,
             )
 
             // deposit it in the recipient's account using their reference

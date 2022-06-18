@@ -78,7 +78,7 @@ pub contract QRLNFT: NonFungibleToken {
                 case Type<MetadataViews.Editions>():
                     // There is no max number of NFTs that can be minted from this contract
                     // so the max edition field value is set to nil
-                    let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.id, max: nil)
+                    let editionInfo = MetadataViews.Edition(name: "QRL", number: self.id, max: nil)
                     let editionList: [MetadataViews.Edition] = [editionInfo]
                     return MetadataViews.Editions(
                         editionList
@@ -92,7 +92,7 @@ pub contract QRLNFT: NonFungibleToken {
                         self.royalties
                     )
                 case Type<MetadataViews.ExternalURL>():
-                    return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
+                    return MetadataViews.ExternalURL("https://qldernft.com/lands".concat(self.id.toString()))
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
                         storagePath: QRLNFT.CollectionStoragePath,
@@ -108,18 +108,19 @@ pub contract QRLNFT: NonFungibleToken {
                 case Type<MetadataViews.NFTCollectionDisplay>():
                     let media = MetadataViews.Media(
                         file: MetadataViews.HTTPFile(
-                            url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                            url: "https://images.ctfassets.net/q6b7xnxzylaw/7mCJkTtu6ZOjqOrhWM1rz/18a37147ca46602c66fa522a2c796ab9/logo--qrl.png?w=800"
                         ),
-                        mediaType: "image/svg+xml"
+                        mediaType: "image/png"
                     )
                     return MetadataViews.NFTCollectionDisplay(
-                        name: "The Example Collection",
-                        description: "This collection is used as an example to help you develop your next Flow NFT.",
-                        externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
+                        name: "The Ultimate Queenslander NFT",
+                        description: "
+In search of the best postcode in the Metaverse, we have dreamt of the quintessential experience. A cauldron of energy, irrepressible, forming a virtual oasis of landscapes shaped by the community, aligned to the spirit of the state.",
+                        externalURL: MetadataViews.ExternalURL("https://qldernft.com/"),
                         squareImage: media,
                         bannerImage: media,
                         socials: {
-                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                            "twitter": MetadataViews.ExternalURL("https://twitter.com/nftqlder")
                         }
                     )
             }
